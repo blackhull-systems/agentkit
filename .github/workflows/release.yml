@@ -10,10 +10,10 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: npm # set required reviewers on this environment: the owner approves every publish
+    environment: npm # named in npm's trusted publisher for this package; the owner signs every release before it is tagged
     permissions:
       contents: read
-      id-token: write # for provenance only
+      id-token: write # npm trusted publishing: the job proves who it is to npm, and no npm token exists
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -27,5 +27,3 @@ jobs:
       - run: npm ci --no-fund --no-audit --ignore-scripts
       - run: npm run check # format, lint, types, tests with coverage, package checks
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

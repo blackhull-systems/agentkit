@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 — 2026-11-04
+
+- Published from GitHub Actions by npm trusted publishing: no npm token exists that could publish this package.
+- The user-agent names this version.
+
 ## 0.1.0 — 2026-11-02
 
 First release.
