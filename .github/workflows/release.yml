@@ -1,0 +1,31 @@
+name: release
+# Publishing happens only here, never from a laptop: a version tag on a commit that passes the tests publishes to npm
+# with provenance, a signed public record (Sigstore) that THIS repository's commit built the package. Anyone can check
+# it: `npm audit signatures`, or the "Provenance" panel on the package's npm page.
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm # set required reviewers on this environment: the owner approves every publish
+    permissions:
+      contents: read
+      id-token: write # for provenance only
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24 # npm 11.5+, which trusted publishing (OIDC) needs
+          registry-url: https://registry.npmjs.org
+      - name: the tag is the package version
+        run: test "v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
+      - run: npm ci --no-fund --no-audit --ignore-scripts
+      - run: npm run check # format, lint, types, tests with coverage, package checks
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

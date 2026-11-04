@@ -1,0 +1,79 @@
+{
+  "name": "@blackhull/agentkit",
+  "version": "0.1.0",
+  "description": "Coinbase AgentKit action provider for Blackhull: check a Base token, an x402 service or find the best provider before your agent pays or trades. Paid per call over x402; facts with evidence, not advice.",
+  "license": "Apache-2.0",
+  "author": "Black Hull Systems LLC <support@blackhull.systems>",
+  "homepage": "https://blackhullsystems.com/docs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackhull-systems/agentkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/blackhull-systems/agentkit/issues",
+    "email": "support@blackhull.systems"
+  },
+  "keywords": [
+    "agentkit",
+    "x402",
+    "base",
+    "ai-agents",
+    "token-risk",
+    "action-provider",
+    "blackhull"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/*.js",
+    "dist/*.d.ts"
+  ],
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0 .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run build && node --test --experimental-test-coverage --test-coverage-include=dist/** --test-coverage-lines=95 --test-coverage-branches=90 --test-coverage-functions=95 test/*.test.cjs",
+    "check:package": "npm run build && publint --strict && attw --pack . --profile node16",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run check:package",
+    "prepublishOnly": "npm run check"
+  },
+  "peerDependencies": {
+    "@coinbase/agentkit": "^0.10.0"
+  },
+  "dependencies": {
+    "@x402/evm": "^2.29.0",
+    "@x402/fetch": "^2.29.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@coinbase/agentkit": "^0.10.4",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "publint": "^0.3.25",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "viem": "^2.57.16"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

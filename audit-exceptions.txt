@@ -1,0 +1,4 @@
+# Advisories reviewed and accepted, one per line: the GHSA id, then why. CI fails on any other high or critical one.
+GHSA-mrhx-c7xc-m3w5  # zod < 4.6.6: memory exhaustion on a large array sent to an array schema without a length cap.
+                     # Not reachable here: no schema in this package contains an array. @coinbase/agentkit (0.10.4,
+                     # the latest) itself requires zod 3, which has no fixed release. Remove when AgentKit moves to zod 4.
