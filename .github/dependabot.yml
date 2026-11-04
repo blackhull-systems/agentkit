@@ -1,8 +1,14 @@
+# ALERTS, NOT PULL REQUESTS (owner, 2026-11-04). main changes only through a release the owner signs, built from
+# Blackhull's own source where every check runs; a pull request merged here would bypass that, and the next release
+# would undo it. Security advisories still alert (repository Settings -> Dependabot alerts); version updates are
+# brought into the source and released signed.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule: { interval: weekly }
+    open-pull-requests-limit: 0
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
+    open-pull-requests-limit: 0

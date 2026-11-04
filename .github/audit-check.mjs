@@ -4,12 +4,18 @@
 import { readFileSync, existsSync } from "node:fs";
 
 const [report, exceptions] = process.argv.slice(2);
-const allowed = new Set(existsSync(exceptions)
-  ? readFileSync(exceptions, "utf8").split("\n").map(l => l.split("#")[0].trim()).filter(Boolean) : []);
+const allowed = new Set(
+  existsSync(exceptions)
+    ? readFileSync(exceptions, "utf8")
+        .split("\n")
+        .map((l) => l.split("#")[0].trim())
+        .filter(Boolean)
+    : [],
+);
 const found = new Map();
 for (const v of Object.values(JSON.parse(readFileSync(report, "utf8")).vulnerabilities || {})) {
   for (const via of v.via) {
-    if (typeof via !== "object" || !["high", "critical"].includes(via.severity)) continue;  // strings: the path to it
+    if (typeof via !== "object" || !["high", "critical"].includes(via.severity)) continue; // strings: the path to it
     const id = via.url.split("/").pop();
     found.set(id, `${via.severity}: ${v.name} ${via.range}: ${via.title} (${via.url})`);
   }

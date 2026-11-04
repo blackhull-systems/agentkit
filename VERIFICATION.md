@@ -1,13 +1,13 @@
 # Verification
 
-The checks this release passed, run 2026-11-04 14:39 UTC on Node 22.23.4, each from a clean copy of this repository's files. Generated from the run's record, not written by hand.
+The checks this release passed, run 2026-11-04 21:30 UTC on Node 22.23.4, each from a clean copy of this repository's files. Generated from the run's record, not written by hand.
 
 | Check | Result | What ran | Versions |
 |---|---|---|---|
 | `unit` | pass | 16 passed, 0 failed (offline, no payment), within coverage thresholds; format, lint, types and package checks clean | @coinbase/agentkit 0.10.4, @x402/fetch 2.29.0, @x402/evm 2.29.0 |
 | `paid-path` | pass | a real paid `check_token` through AgentKit and this provider, signed by Blackhull's test wallet as a bring-your-own `x402Client`: $0.01 USDC, answered OWNER_ACTIVE, CAN_MINT, CAN_PAUSE, CAN_BLACKLIST, UPGRADEABLE, LIQUIDITY |  |
 
-The paid check settled on Base in transaction [`0xa00ef687…de4f1f`](https://basescan.org/tx/0xa00ef6871f0715c4d524e19b8696cf3720acd7c5eb11178e3f7cd6326fde4f1f). It was paid by Blackhull's own test wallet to Blackhull, so it is a test of the payment path, not revenue. The harness that holds that wallet is Blackhull's own and is not in this repository; everything it calls is.
+The paid check settled on Base in transaction [`0xa4524c03…5633d9`](https://basescan.org/tx/0xa4524c035bcf52454950c7b1e12b8371f06a24e6708fb50c89d3de32015633d9). It was paid by Blackhull's own test wallet to Blackhull, so it is a test of the payment path, not revenue. The harness that holds that wallet is Blackhull's own and is not in this repository; everything it calls is.
 
 No test that runs in CI can spend money: free samples need no wallet, and the spend-cap tests use a fresh, never-funded key with a cap below the price.
 
