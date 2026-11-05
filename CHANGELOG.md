@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3 — 2026-11-05
+
+- Package search keywords say what `check_token` now does: honeypot detection by sell simulation, token security,
+  Uniswap v4, for trading bots. No code changed.
+
 ## 0.1.2 — 2026-11-05
 
 - `check_token` now also says whether a buyer could sell the token: Blackhull simulates a small buy and an immediate

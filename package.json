@@ -1,6 +1,6 @@
 {
   "name": "@blackhull/agentkit",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Coinbase AgentKit action provider for Blackhull: check a Base token, an x402 service or find the best provider before your agent pays or trades. Paid per call over x402; facts with evidence, not advice.",
   "license": "Apache-2.0",
   "author": "Black Hull Systems LLC <support@blackhull.systems>",
@@ -15,10 +15,17 @@
   },
   "keywords": [
     "agentkit",
+    "coinbase-agentkit",
     "x402",
     "base",
     "ai-agents",
+    "trading-bot",
+    "honeypot",
+    "honeypot-detection",
+    "sell-simulation",
+    "token-security",
     "token-risk",
+    "uniswap-v4",
     "action-provider",
     "blackhull"
   ],
