@@ -182,6 +182,7 @@ test("each action calls its own route with the caller's query", async () => {
     ["checkService", { url: "https://x.test/a", detailed: true }],
     ["findProvider", { capability: "search", maxPriceUsdc: 0.01 }],
     ["findProvider", { capability: "search" }],
+    ["checkTokens", { addresses: [TOKEN, USDC] }],
   ]) {
     const calls = stub(new Response("{}", { status: 404 }));
     await p[action](wallet, args);
@@ -192,6 +193,7 @@ test("each action calls its own route with the caller's query", async () => {
     "https://api.test/verdict/x402?url=https%3A%2F%2Fx.test%2Fa",
     "https://api.test/route?capability=search&max_price=0.01",
     "https://api.test/route?capability=search",
+    `https://api.test/check/tokens?addresses=${TOKEN}%2C${USDC}`,
   ]);
 });
 
@@ -215,4 +217,31 @@ test("only Base mainnet is supported", () => {
   const p = blackhullActionProvider();
   assert.equal(p.supportsNetwork({ networkId: "base-mainnet", protocolFamily: "evm" }), true);
   assert.equal(p.supportsNetwork({ networkId: "base-sepolia", protocolFamily: "evm" }), false);
+});
+
+test("a batch is capped as one call: ten tokens at $0.008 is refused under the default cap, paid under 0.08", async () => {
+  const ten = Array.from({ length: 10 }, (_, i) => "0x" + String(i).repeat(40));
+  let calls = stub(quote(80000));
+  let out = JSON.parse(await blackhullActionProvider().checkTokens(wallet, { addresses: ten }));
+  assert.match(out.message, /price 0\.08 USDC is above maxPriceUsdc 0\.05; not paid/);
+  assert.equal(
+    calls.some((c) => c.paid),
+    false,
+  );
+  calls = stub(quote(80000), ok({ count: 10, tokens: [] }));
+  out = JSON.parse(await blackhullActionProvider({ maxPriceUsdc: 0.08 }).checkTokens(wallet, { addresses: ten }));
+  assert.deepEqual(out, { price_usdc: 0.08, result: { count: 10, tokens: [] } });
+  assert.deepEqual(
+    calls.map((c) => c.paid),
+    [false, true],
+  );
+});
+
+test("a batch takes 1 to 10 well-formed addresses", () => {
+  const { CheckTokensSchema } = require("../dist/blackhullActionProvider.js");
+  assert.equal(CheckTokensSchema.safeParse({ addresses: [TOKEN] }).success, true);
+  assert.equal(CheckTokensSchema.safeParse({ addresses: Array(10).fill(TOKEN) }).success, true);
+  for (const bad of [[], Array(11).fill(TOKEN), ["0x12"], [TOKEN + "00"]]) {
+    assert.equal(CheckTokensSchema.safeParse({ addresses: bad }).success, false, JSON.stringify(bad));
+  }
 });

@@ -3,6 +3,7 @@
  *
  * Checks an agent should run BEFORE it pays or trades, sold per call over x402 by Blackhull (https://blackhull.systems):
  *   - check_token          a Base token's owner, admin powers, upgradeability, liquidity, and whether a buyer could sell ($0.01)
+ *   - check_tokens         the same check for up to 10 tokens in one call ($0.008 per token)
  *   - check_x402_service   grade and finding codes (or the full findings report) for a paid x402 service ($0.003-$0.008)
  *   - find_provider        the best-rated paid providers for a job within a budget ($0.003)
  * Every answer is a measurement of public data with its evidence. Facts, not financial advice.
@@ -36,6 +37,15 @@ const USDC_BASE = { network: "eip155:8453", asset: "0x833589fcd6edb6e08f4c7c32d4
 
 export const CheckTokenSchema = z
   .object({ address: z.string().regex(ADDRESS).describe("The token contract address on Base (0x + 40 hex)") })
+  .strip();
+export const CheckTokensSchema = z
+  .object({
+    addresses: z
+      .array(z.string().regex(ADDRESS))
+      .min(1)
+      .max(10)
+      .describe("1 to 10 token contract addresses on Base (0x + 40 hex each)"),
+  })
   .strip();
 export const CheckServiceSchema = z
   .object({
@@ -88,13 +98,29 @@ export class BlackhullActionProvider extends ActionProvider<EvmWalletProvider> {
     description: `Check a token on Base before trading it. Returns measured facts read live from the chain, each with its evidence:
 who controls the contract (owner), whether its code can mint, pause, blacklist or change fees, whether it is an upgradeable
 proxy, how much WETH, ETH or USDC its pools hold on Uniswap v2, v3 and v4, Aerodrome and Slipstream, and whether a
-buyer could sell: a small buy and an immediate sale are simulated on the deepest pool (nothing is sent or paid), with
-the buy and sell tax measured. Finding codes include SELL_BLOCKED (bought but could not sell), HIGH_TAX (10% or more
-taken on a buy or sale), SELL_OK, OWNER_ACTIVE, CAN_MINT, UPGRADEABLE, THIN_LIQUIDITY and NO_POOL_FOUND. Costs $0.01 USDC per call via x402 (paid from this wallet). Facts, not financial advice.`,
+buyer could sell: a small buy and an immediate sale are simulated on the deepest pool, the sale sent through Uniswap's
+Universal Router as a user's goes (nothing is sent or paid), with the buy and sell tax measured, and how many real
+sales that pool has seen recently. Finding codes include SELL_BLOCKED (bought but could not sell), HIGH_TAX (10% or
+more taken on a buy or sale), SELL_OK, RECENT_SELLS (real wallets sold in the last minutes or hours), OWNER_ACTIVE,
+CAN_MINT, UPGRADEABLE, THIN_LIQUIDITY and NO_POOL_FOUND. Costs $0.01 USDC per call via x402 (paid from this wallet).
+Facts, not financial advice.`,
     schema: CheckTokenSchema,
   })
   async checkToken(walletProvider: EvmWalletProvider, args: z.infer<typeof CheckTokenSchema>): Promise<string> {
     return this.call(walletProvider, "/check/token", { address: args.address });
+  }
+
+  @CreateAction({
+    name: "check_tokens",
+    description: `The check_token check for up to 10 Base tokens in one call, e.g. every candidate on a watchlist before
+choosing which to trade. Returns one answer per token, in the order given, each with the same facts, evidence and finding
+codes as check_token (SELL_BLOCKED, HIGH_TAX, SELL_OK, RECENT_SELLS, ...). Costs $0.008 USDC per token via x402, paid as
+one payment; all or nothing: if any token cannot be checked, the call is not charged. The provider's maxPriceUsdc caps
+the whole call (the default 0.05 covers 6 tokens; set 0.08 for 10).`,
+    schema: CheckTokensSchema,
+  })
+  async checkTokens(walletProvider: EvmWalletProvider, args: z.infer<typeof CheckTokensSchema>): Promise<string> {
+    return this.call(walletProvider, "/check/tokens", { addresses: args.addresses.join(",") });
   }
 
   @CreateAction({

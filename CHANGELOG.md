@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.4 — 2026-11-05
+
+- `check_tokens`: the token check for up to 10 Base tokens in one call, $0.008 per token, paid as one payment and all
+  or nothing (if any token cannot be checked, nothing is charged). `maxPriceUsdc` caps the whole call: the default
+  0.05 covers 6 tokens; set 0.08 for 10.
+- `check_token`'s description says what the check now does: the simulated sale goes through Uniswap's Universal
+  Router as a user's does, and `RECENT_SELLS` reports real wallets selling on the same pool.
+
 ## 0.1.3 — 2026-11-05
 
 - Package search keywords say what `check_token` now does: honeypot detection by sell simulation, token security,

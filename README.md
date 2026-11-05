@@ -8,7 +8,8 @@ with its evidence. Facts, not financial advice.
 
 | Action | What it answers | Price |
 |---|---|---|
-| `check_token` | A Base token's owner, mint / pause / blacklist / fee powers in its code (proxies resolved), upgradeability, its pools' liquidity on Uniswap v2, v3 and v4, Aerodrome and Slipstream, and whether a buyer could sell it (a simulated buy and immediate sale, taxes measured), with finding codes such as `SELL_BLOCKED`, `HIGH_TAX`, `CAN_MINT`, `THIN_LIQUIDITY` | $0.01 |
+| `check_token` | A Base token's owner, mint / pause / blacklist / fee powers in its code (proxies resolved), upgradeability, its pools' liquidity on Uniswap v2, v3 and v4, Aerodrome and Slipstream, whether a buyer could sell it (a simulated buy and immediate sale through Uniswap's Universal Router, taxes measured) and whether real wallets are selling it, with finding codes such as `SELL_BLOCKED`, `HIGH_TAX`, `RECENT_SELLS`, `CAN_MINT`, `THIN_LIQUIDITY` | $0.01 |
+| `check_tokens` | The same check for up to 10 tokens in one call, all or nothing (nothing is charged unless every token is answered) | $0.008 per token |
 | `check_x402_service` | A paid x402 service's grade and finding codes (`detailed: true` for the full report with evidence) | $0.003 / $0.008 |
 | `find_provider` | The best-rated paid providers for a job within a budget, ranked neutrally | $0.003 |
 
@@ -36,7 +37,8 @@ Your agent's own wallet pays, in USDC on Base. It needs a little USDC (a dollar 
   `0.05`), or one whose price cannot be read, is refused. The cap applies to whichever client signs, including one you
   bring; the client the provider builds from your wallet also has the x402 library's own spend cap. An invalid cap
   (`NaN`, `Infinity`, zero or negative) is refused when the provider is created. To tighten it:
-  `blackhullActionProvider({ maxPriceUsdc: 0.02 })`.
+  `blackhullActionProvider({ maxPriceUsdc: 0.02 })`. The cap is per call, so it also caps a whole `check_tokens`
+  batch: the default covers 6 tokens; `maxPriceUsdc: 0.08` covers 10.
 - **No charge for no answer:** if Blackhull cannot answer (for example the chain cannot be read), it declines before the
   payment settles.
 - **Try it free:** `blackhullActionProvider({ trialMode: true })` answers each action's fixed sample query at no charge.
