@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2 — 2026-11-05
+
+- `check_token` now also says whether a buyer could sell the token: Blackhull simulates a small buy and an immediate
+  sale of everything bought on the token's deepest pool (nothing is sent or paid) and reports `SELL_OK`, `SELL_BLOCKED`
+  (with the revert's own words), `HIGH_TAX` (10% or more taken by the token on either leg, measured from balances) or
+  `BUY_FAILED`. The action's description names these codes so an agent knows to look for them.
+
 ## 0.1.1 — 2026-11-04
 
 - Published from GitHub Actions by npm trusted publishing: no npm token exists that could publish this package.

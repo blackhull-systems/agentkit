@@ -8,7 +8,7 @@ with its evidence. Facts, not financial advice.
 
 | Action | What it answers | Price |
 |---|---|---|
-| `check_token` | A Base token's owner, mint / pause / blacklist / fee powers in its code (proxies resolved), upgradeability and its pools' liquidity on Uniswap v2, v3 and v4, Aerodrome and Slipstream, with finding codes such as `CAN_MINT`, `UPGRADEABLE`, `THIN_LIQUIDITY` | $0.01 |
+| `check_token` | A Base token's owner, mint / pause / blacklist / fee powers in its code (proxies resolved), upgradeability, its pools' liquidity on Uniswap v2, v3 and v4, Aerodrome and Slipstream, and whether a buyer could sell it (a simulated buy and immediate sale, taxes measured), with finding codes such as `SELL_BLOCKED`, `HIGH_TAX`, `CAN_MINT`, `THIN_LIQUIDITY` | $0.01 |
 | `check_x402_service` | A paid x402 service's grade and finding codes (`detailed: true` for the full report with evidence) | $0.003 / $0.008 |
 | `find_provider` | The best-rated paid providers for a job within a budget, ranked neutrally | $0.003 |
 

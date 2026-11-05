@@ -2,7 +2,7 @@
  * Blackhull Action Provider for Coinbase AgentKit.
  *
  * Checks an agent should run BEFORE it pays or trades, sold per call over x402 by Blackhull (https://blackhull.systems):
- *   - check_token          a Base token's owner, mint/pause/blacklist/fee powers, upgradeability and liquidity ($0.01)
+ *   - check_token          a Base token's owner, admin powers, upgradeability, liquidity, and whether a buyer could sell ($0.01)
  *   - check_x402_service   grade and finding codes (or the full findings report) for a paid x402 service ($0.003-$0.008)
  *   - find_provider        the best-rated paid providers for a job within a budget ($0.003)
  * Every answer is a measurement of public data with its evidence. Facts, not financial advice.
@@ -87,8 +87,10 @@ export class BlackhullActionProvider extends ActionProvider<EvmWalletProvider> {
     name: "check_token",
     description: `Check a token on Base before trading it. Returns measured facts read live from the chain, each with its evidence:
 who controls the contract (owner), whether its code can mint, pause, blacklist or change fees, whether it is an upgradeable
-proxy, and how much WETH, ETH or USDC its pools hold on Uniswap v2, v3 and v4, Aerodrome and Slipstream, plus finding
-codes such as OWNER_ACTIVE, CAN_MINT, UPGRADEABLE, THIN_LIQUIDITY or NO_POOL_FOUND. Costs $0.01 USDC per call via x402 (paid from this wallet). Facts, not financial advice.`,
+proxy, how much WETH, ETH or USDC its pools hold on Uniswap v2, v3 and v4, Aerodrome and Slipstream, and whether a
+buyer could sell: a small buy and an immediate sale are simulated on the deepest pool (nothing is sent or paid), with
+the buy and sell tax measured. Finding codes include SELL_BLOCKED (bought but could not sell), HIGH_TAX (10% or more
+taken on a buy or sale), SELL_OK, OWNER_ACTIVE, CAN_MINT, UPGRADEABLE, THIN_LIQUIDITY and NO_POOL_FOUND. Costs $0.01 USDC per call via x402 (paid from this wallet). Facts, not financial advice.`,
     schema: CheckTokenSchema,
   })
   async checkToken(walletProvider: EvmWalletProvider, args: z.infer<typeof CheckTokenSchema>): Promise<string> {
